@@ -15,6 +15,10 @@
 
 import logging
 import logging.config
+import time
+import asyncio
+import pytz
+from datetime import datetime
 
 # Get logging configurations
 logging.config.fileConfig('logging.conf')
@@ -50,6 +54,15 @@ class Bot(Client):
         await super().stop()
         print("Bot stopped. Bye.")
 
+# ⏳ Wait for time sync before launching the bot
+async def wait_for_time_sync():
+    now = datetime.now(pytz.utc)
+    if abs(time.time() - now.timestamp()) > 10:
+        print("⏳ Time out of sync. Sleeping for 30 seconds to sync...")
+        await asyncio.sleep(30)
+
+asyncio.get_event_loop().run_until_complete(wait_for_time_sync())
 
 app = Bot()
 app.run()
+
